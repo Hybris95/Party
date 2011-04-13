@@ -3,15 +3,17 @@ package com.hybris.bukkit.party;
 import org.bukkit.plugin.java.JavaPlugin;
 import  java.util.logging.Logger;
 
+import com.hybris.bukkit.party.api.PartyPlugin;
+import com.hybris.bukkit.party.api.GroupManager;
+
 /**
 * Party plugin for Bukkit
-* @version 0.4a
+* @version 0.6
 * @author Hybris95
 */
-public class Party extends JavaPlugin
+public class Party extends PartyPlugin
 {
 	
-	private PartyGroupManager manager;
 	private Logger log;
 	
 	public void onLoad(){}
@@ -19,20 +21,26 @@ public class Party extends JavaPlugin
 	public void onEnable(){
 		this.log = this.getServer().getLogger();
 		this.log.info("[Party] enabling...");
-		this.manager = new PartyGroupManager(this);
+		this.setManager(new PartyGroupManager(this));
 		this.log.info("[Party] enabled!");
 	}
 	
 	public void onDisable(){
 		this.log.info("[Party] disabling...");
-		this.manager.deleteGroups();
-		this.manager = null;
+		GroupManager manager = this.getManager();
+		if(manager instanceof PartyGroupManager){
+			((PartyGroupManager)manager).deleteGroups();
+		}
+		super.setManager(null);
 		this.log.info("[Party] disabled!");
 		this.log = null;
 	}
 	
-	public PartyGroupManager getManager(){
-		return this.manager;
+	/**
+	 * Disallowed setManager access always return null and does nothing
+	 */
+	protected final GroupManager setManager(GroupManager manager){
+		return null;
 	}
 	
 }
