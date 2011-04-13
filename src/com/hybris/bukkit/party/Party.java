@@ -8,7 +8,6 @@ import com.hybris.bukkit.party.api.GroupManager;
 
 /**
 * Party plugin for Bukkit
-* @version 0.6
 * @author Hybris95
 */
 public class Party extends PartyPlugin
