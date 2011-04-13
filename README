@@ -1,0 +1,10 @@
+# Compilation libraries configuration
+Import craftbukkit.jar and Permissions.jar into the folder ./jars (create it if necessary)
+
+# API Compilation
+Use partyAPI-compile.bash to compile the API on Linux
+Use partyAPI-compile.bat to compile the API on Windows
+
+# Party Compilation (do not forget to compile the API first!)
+Use party-compile.bash to compile Party on Linux
+Use party-compile.bat to compile Party on Windows
