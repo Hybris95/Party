@@ -9,6 +9,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 
+import com.hybris.bukkit.party.api.*;
+
 public class PartyGroup extends Group{
 	
 	public void onEntityDamage(EntityDamageEvent event){

@@ -8,13 +8,16 @@ import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.Event;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+
+import com.hybris.bukkit.party.api.*;
 
 public class PartyGroupManager extends GroupManager{
 	
@@ -27,12 +30,11 @@ public class PartyGroupManager extends GroupManager{
 	protected PartyGroupManager(JavaPlugin plugin){
 		this.server = plugin.getServer();
 		this.plugin = plugin;
-		this.groups = new HashMap<String,PartyGroup>();
-		this.tmpGroups = new HashMap<String,PartyGroup>();
+		this.groups = new HashMap<String,Group>();
+		this.tmpGroups = new HashMap<String,Group>();
 		this.groupSize = 5; // TODO Make the size configurable
 		
 		this.server.getPluginCommand("party").setExecutor(this);
-		//this.server.getPluginCommand("gr").setExecutor(this);
 		this.server.getPluginManager().registerEvent(Event.Type.PLAYER_JOIN, this, Event.Priority.Normal, this.plugin);
 		this.server.getPluginManager().registerEvent(Event.Type.PLAYER_QUIT, this, Event.Priority.Normal, this.plugin);
 	}
@@ -53,7 +55,7 @@ public class PartyGroupManager extends GroupManager{
 		
 		if(!command.getName().equalsIgnoreCase("party")){
 			sender.sendMessage("You have to say /party");
-			return false; // TOREMOVE to allow /gr command
+			return false;
 		} // You have to say /party
 		
 		if(args.length == 0){
@@ -119,7 +121,7 @@ public class PartyGroupManager extends GroupManager{
 			if((sendedGroup != null) && (sendedGroup instanceof PartyGroup)){
 				if(((PartyGroup)sendedGroup).addMember(sender)){
 					sender.sendMessage("You have successfully joined " + sended.getName() + " party");
-					this.server.getPluginManager().registerEvent(Event.Type.ENTITY_DAMAGED, sendedGroup, Event.Priority.High, this.plugin);
+					this.server.getPluginManager().registerEvent(Event.Type.ENTITY_DAMAGE, sendedGroup, Event.Priority.High, this.plugin);
 					return true;
 				}
 				else{
@@ -137,7 +139,7 @@ public class PartyGroupManager extends GroupManager{
 						sender.sendMessage(e.getMessage());
 						return false;
 					}
-					this.server.getPluginManager().registerEvent(Event.Type.ENTITY_DAMAGED, realGroup, Event.Priority.High, this.plugin);
+					this.server.getPluginManager().registerEvent(Event.Type.ENTITY_DAMAGE, realGroup, Event.Priority.High, this.plugin);
 					sender.sendMessage("You have joined " + sended.getName() + " party");
 					sended.sendMessage(sender.getName() + " has joined your party");
 					this.groups.put(sended.getName(),realGroup);
@@ -165,7 +167,7 @@ public class PartyGroupManager extends GroupManager{
 		
 		if(sendedGroup == null){
 			if((senderGroup != null) && (senderGroup instanceof PartyGroup)){
-				if((PartyGroup)senderGroup).inviteMember(sended)){
+				if(((PartyGroup)senderGroup).inviteMember(sended)){
 					sended.sendMessage(sender.getName() + " invited you to his party");
 					sender.sendMessage("You invited " + sended.getName() + " to your party");
 					return true;
@@ -209,7 +211,7 @@ public class PartyGroupManager extends GroupManager{
 	protected boolean deinvite(Player sender, Player sended){
 		
 		Group senderGroup = this.isLeader(sender);
-		PartyGroup tmpGroup = this.tmpGroups.get(sender.getName());
+		Group tmpGroup = this.tmpGroups.get(sender.getName());
 		
 		if((senderGroup != null) && (senderGroup instanceof PartyGroup)){
 			if(((PartyGroup)senderGroup).deinviteMember(sended)){
@@ -221,7 +223,7 @@ public class PartyGroupManager extends GroupManager{
 				return false;
 			}
 		}
-		else if(tmpGroup != null){
+		else if((tmpGroup != null) && (tmpGroup instanceof PartyGroup)){
 			if(tmpGroup.getMember(sended.getName()) != null){
 				this.tmpGroups.remove(sender.getName());
 				sender.sendMessage("You have deinvited " + sended.getName());
@@ -315,7 +317,7 @@ public class PartyGroupManager extends GroupManager{
 		return true;
 	}
 	
-	public void onPlayerJoin(PlayerEvent event){
+	public void onPlayerJoin(PlayerJoinEvent event){
 		Player player = event.getPlayer();
 		Group playerGroup = this.isLeader(player);
 		
@@ -348,7 +350,7 @@ public class PartyGroupManager extends GroupManager{
 		
 	}
 	
-	public void onPlayerQuit(PlayerEvent event){
+	public void onPlayerQuit(PlayerQuitEvent event){
 		Player player = event.getPlayer();
 		this.removeFromAllInvitedGroups(player);
 		
