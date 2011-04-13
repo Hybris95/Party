@@ -1,0 +1,14 @@
+name: Party
+main: com.hybris.bukkit.party.Party
+version: 0.5
+website: 
+author: Hybris95
+description: 
+             Party allows users to make party
+             When in the same party, you cannot attack the other members
+             You can list the members of your group
+             API for other plugins
+commands:
+    party:
+        description: Use party functionnalities
+        usage: /party <join|invite|deinvite|kick|leave|list> [player_name]
